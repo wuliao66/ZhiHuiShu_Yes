@@ -1,0 +1,64 @@
+window.vm = (() => {
+    const keys = [
+      "totalStudyTime",
+      "playTimes",
+      "playRate",
+      "watchPointPost",
+      "videoList",
+      "lastViewVideoId",
+      "computeProgree",
+      "totalStudyTimeFun",
+      "saveDdsjkTimeInWhileFn"
+    ];
+
+    for (const el of document.querySelectorAll("*")) {
+      const candidates = [
+        el.__vue__,
+        el.__vue__ && el.__vue__.$parent,
+        el.__vue__ && el.__vue__.$root,
+        el.__vueParentComponent,
+        el.__vueParentComponent && el.__vueParentComponent.proxy,
+        el.__vueParentComponent && el.__vueParentComponent.ctx
+      ].filter(Boolean);
+
+      for (const vm of candidates) {
+        if (keys.every(k => k in vm)) {
+          return vm;
+        }
+      }
+    }
+
+    return null;
+  })();
+
+  vm && ({
+    totalStudyTime: vm.totalStudyTime,
+    playTimes: vm.playTimes,
+    playRate: vm.playRate,
+    hasTotalStudyTimeFun: typeof vm.totalStudyTimeFun,
+    hasComputeProgree: typeof vm.computeProgree
+  });
+
+  (() => {
+    if (!window.vm) return "vm 不存在";
+
+    vm.playRate = 20;
+
+    if (window.__ctfProgressTimer) {
+      clearInterval(window.__ctfProgressTimer);
+    }
+
+    window.__ctfProgressTimer = setInterval(() => {
+      vm.playRate = 20;
+      vm.totalStudyTimeFun.call(vm);
+    }, 500);
+
+    return {
+      status: "started",
+      totalStudyTime: vm.totalStudyTime,
+      playTimes: vm.playTimes,
+      playRate: vm.playRate
+    };
+  })();
+  
+  使用方法为 在视频网页按下f12，在控制台输入上述代码即可。
